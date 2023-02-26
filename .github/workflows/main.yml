@@ -26,7 +26,7 @@ jobs:
       run: build/linux-x64/install.dependencies.sh
 
     - name: Install Magick.Native
-      run: 'build/shared/install.Magick.Native.sh "dlemstra" "${{ secrets.GITHUB_TOKEN }}" linux x64'
+      run: 'build/shared/install.Magick.Native.sh "compujuckel" "${{ secrets.GITHUB_TOKEN }}" linux x64'
 
     - name: Build
       run: build/shared/build.Magick.NET.sh
@@ -39,89 +39,6 @@ jobs:
 
     - name: Test OpenMP
       run: build/shared/test.Magick.NET.sh OpenMP
-
-  linux_musl:
-    name: 'Linux musl (x64) (Q8/Q16/Q16-HDRI)'
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:6.0-alpine
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
-
-    - name: Install dependencies
-      run: build/linux-musl-x64/install.dependencies.sh
-
-    - name: Install Magick.Native
-      run: 'build/shared/install.Magick.Native.sh "dlemstra" "${{ secrets.GITHUB_TOKEN }}" linux-musl x64'
-
-    - name: Build
-      run: build/shared/build.Magick.NET.sh
-
-    - name: Test
-      run: build/shared/test.Magick.NET.sh
-
-    - name: Build OpenMP
-      run: build/shared/build.Magick.NET.sh OpenMP
-
-    - name: Test OpenMP
-      run: build/shared/test.Magick.NET.sh OpenMP
-
-  linux_arm64:
-    name: 'Linux arm64 (Q8/Q16/Q16-HDRI)'
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
-
-    - name: Install Magick.Native
-      run: 'build/shared/install.Magick.Native.sh "dlemstra" "${{ secrets.GITHUB_TOKEN }}" linux arm64'
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@master
-      with:
-        platforms: arm64
-
-    - name: Build and Test
-      run: |
-        export path=$(pwd)
-        docker run -v $path:/Magick.NET mcr.microsoft.com/dotnet/sdk:6.0-focal-arm64v8 /Magick.NET/build/linux-arm64/github-actions.sh
-
-  macos:
-    name: 'MacOS (Q8/Q16/Q16-HDRI)'
-    runs-on: macos-11
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
-
-    - name: Install dependencies
-      run: build/osx-x64/install.dependencies.sh
-
-    - name: Install .NET 6.0
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-
-    - name: Install Magick.Native
-      run: 'build/shared/install.Magick.Native.sh "dlemstra" "${{ secrets.GITHUB_TOKEN }}" macos x64'
-
-    - name: Build
-      run: build/shared/build.Magick.NET.sh
-
-    - name: Test
-      run: build/shared/test.Magick.NET.sh
 
   windows:
     name: Windows
@@ -129,8 +46,8 @@ jobs:
 
     strategy:
       matrix:
-        quantumName: [Q8, Q8-OpenMP, Q16, Q16-OpenMP, Q16-HDRI, Q16-HDRI-OpenMP]
-        platformName: [x86, x64, arm64, Any CPU]
+        quantumName: [Q8]
+        platformName: [x64]
         exclude:
         - quantumName: Q8-OpenMP
           platformName: x86
@@ -157,7 +74,7 @@ jobs:
       working-directory: build/windows
 
     - name: Create nuget.config
-      run: './create-nuget-config.cmd "dlemstra" "${{ secrets.GITHUB_TOKEN }}"'
+      run: './create-nuget-config.cmd "compujuckel" "${{ secrets.GITHUB_TOKEN }}"'
       working-directory: src/Magick.Native
 
     - name: Install Magick.Native
@@ -178,13 +95,13 @@ jobs:
       run: './build.Magick.NET.cmd ${{ matrix.quantumName }} "${{ matrix.platformName }}" Release'
       working-directory: build/windows
 
-    - name: Sign library (Magick.NET)
-      uses: dlemstra/code-sign-action@v1
-      with:
-        certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
-        password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
-        folder: src/Magick.NET/bin
-        recursive: true
+    #- name: Sign library (Magick.NET)
+    #  uses: dlemstra/code-sign-action@v1
+    #  with:
+    #    certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
+    #    password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
+    #    folder: src/Magick.NET/bin
+    #    recursive: true
 
     - name: Set NuGet version
       run: ./set.version.ps1
@@ -194,12 +111,12 @@ jobs:
       run: './publish.cmd ${{ matrix.quantumName }} "${{ matrix.platformName }}"'
       working-directory: publish
 
-    - name: Sign NuGet package
-      uses: dlemstra/code-sign-action@v1
-      with:
-        certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
-        password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
-        folder: publish/output
+    #- name: Sign NuGet package
+    #  uses: dlemstra/code-sign-action@v1
+    #  with:
+    #    certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
+    #    password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
+    #    folder: publish/output
 
     - name: Upload library
       uses: actions/upload-artifact@v3
@@ -227,7 +144,7 @@ jobs:
       working-directory: build/windows
 
     - name: Create nuget.config
-      run: './create-nuget-config.cmd "dlemstra" "${{ secrets.GITHUB_TOKEN }}"'
+      run: './create-nuget-config.cmd "compujuckel" "${{ secrets.GITHUB_TOKEN }}"'
       working-directory: src/Magick.Native
 
     - name: Install Magick.Native
@@ -238,13 +155,13 @@ jobs:
       run: './build.Magick.NET.cmd "Q8" "Any CPU" Release'
       working-directory: build/windows
 
-    - name: 'Sign library (Magick.NET.${{ matrix.libraryName }})'
-      uses: dlemstra/code-sign-action@v1
-      with:
-        certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
-        password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
-        folder: 'src/Magick.NET.${{ matrix.libraryName }}/bin'
-        recursive: true
+    #- name: 'Sign library (Magick.NET.${{ matrix.libraryName }})'
+    #  uses: dlemstra/code-sign-action@v1
+    #  with:
+    #    certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
+    #    password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
+    #    folder: 'src/Magick.NET.${{ matrix.libraryName }}/bin'
+    #    recursive: true
 
     - name: Set NuGet version
       run: ./set.version.ps1
@@ -254,12 +171,12 @@ jobs:
       run: './publish.library.cmd "Magick.NET.${{ matrix.libraryName }}"'
       working-directory: publish
 
-    - name: Sign NuGet package
-      uses: dlemstra/code-sign-action@v1
-      with:
-        certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
-        password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
-        folder: publish/output
+    #- name: Sign NuGet package
+    #  uses: dlemstra/code-sign-action@v1
+    #  with:
+    #    certificate: '${{ secrets.IMAGEMAGICK_CERTIFICATE }}'
+    #    password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
+    #    folder: publish/output
 
     - name: Upload library
       uses: actions/upload-artifact@v3
