@@ -855,22 +855,6 @@ namespace ImageMagick
             => _nativeInstance.Width;
 
         /// <summary>
-        /// Determines whether the specified <see cref="MagickImage"/> instances are considered equal.
-        /// </summary>
-        /// <param name="left">The first <see cref="MagickImage"/> to compare.</param>
-        /// <param name="right">The second <see cref="MagickImage"/> to compare.</param>
-        public static bool operator ==(MagickImage? left, MagickImage? right)
-            => Equals(left, right);
-
-        /// <summary>
-        /// Determines whether the specified <see cref="MagickImage"/> instances are not considered equal.
-        /// </summary>
-        /// <param name="left">The first <see cref="MagickImage"/> to compare.</param>
-        /// <param name="right">The second <see cref="MagickImage"/> to compare.</param>
-        public static bool operator !=(MagickImage? left, MagickImage? right)
-            => !Equals(left, right);
-
-        /// <summary>
         /// Determines whether the first <see cref="MagickImage"/> is more than the second <see cref="MagickImage"/>.
         /// </summary>
         /// <param name="left">The first <see cref="MagickImage"/> to compare.</param>
@@ -2622,14 +2606,6 @@ namespace ImageMagick
         /// <exception cref="MagickException">Thrown when an error is raised by ImageMagick.</exception>
         public void Equalize(Channels channels)
             => _nativeInstance.Equalize(channels);
-
-        /// <summary>
-        /// Determines whether the specified object is equal to the current <see cref="MagickImage"/>.
-        /// </summary>
-        /// <param name="obj">The object to compare this <see cref="MagickImage"/> with.</param>
-        /// <returns>True when the specified object is equal to the current <see cref="MagickImage"/>.</returns>
-        public override bool Equals(object? obj)
-            => Equals(obj as MagickImage);
 
         /// <summary>
         /// Determines whether the specified <see cref="IMagickImage{TQuantumType}"/> is equal to the current <see cref="MagickImage"/>.

@@ -118,7 +118,6 @@ jobs:
     #    password: '${{ secrets.IMAGEMAGICK_CERTIFICATE_PASSWORD }}'
     #    folder: publish/output
 
-
     - name: Upload library
       uses: actions/upload-artifact@v3
       with:
